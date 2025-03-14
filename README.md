@@ -1,2 +1,2 @@
 # yolov8_3d_ros
- ROS noetic-based yolov8 3d and 2d detection
+This project contains yolo 2d object detection and 3d object detection based on ROS noetic. In order to use it, you may need to modify the model files in the launch file and modify the files inside the config folder.
