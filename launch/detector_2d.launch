@@ -1,13 +1,11 @@
 <launch>
-  <!-- 参数配置 -->
+  <!-- Parameter configuration -->
   <arg name="model_path" default="$(find yolov8_3d)/models/yolov8m.pt"/>
   <arg name="input_topic" default="/rgb/image_raw"/>
   
-  <!-- 启动检测节点 -->
+  <!-- Launch detection node -->
   <node name="yolov8_detector" pkg="yolov8_3d" type="detector_node.py" output="screen">
     <param name="model_path" value="$(arg model_path)"/>
     <param name="input_topic" value="$(arg input_topic)"/>
-    <param name="camera_info" value="$(find yolov8_3d)/config/camera_info.yaml"/>
-    <param name="detector_params" value="$(find yolov8_3d)/config/detector_params.yaml"/>
   </node>
 </launch>

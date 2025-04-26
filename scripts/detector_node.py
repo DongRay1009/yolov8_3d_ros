@@ -1,57 +1,57 @@
 #!/usr/bin/env python3
-# filepath: /home/msi/yolo_3d_ws/src/yolov8_3d/scripts/detector_node.py
+# filepath: d:\GitHub repo\yolov8_3d_ros\scripts\detector_node.py
 
 import rospy
 import cv2
 import numpy as np
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-from ultralytics import YOLO  # 导入ultralytics包来使用PyTorch模型
+from ultralytics import YOLO  # Import ultralytics package to use PyTorch model
 
 class YoloV8Detector:
     def __init__(self, model_path):
-        """初始化YOLOv8检测器使用PyTorch模型"""
+        """Initialize YOLOv8 detector with PyTorch model"""
         try:
-            self.model = YOLO(model_path)  # 加载PyTorch模型
+            self.model = YOLO(model_path)  # Load PyTorch model
             self.confidence_threshold = 0.25
-            rospy.loginfo(f"成功加载YOLOv8 PyTorch模型: {model_path}")
+            rospy.loginfo(f"Successfully loaded YOLOv8 PyTorch model: {model_path}")
         except Exception as e:
-            rospy.logerr(f"加载模型失败: {e}")
+            rospy.logerr(f"Failed to load model: {e}")
             raise e
         
     def detect(self, image):
-        """使用YOLOv8 PyTorch模型进行目标检测"""
-        # 使用ultralytics API预测
+        """Perform object detection using YOLOv8 PyTorch model"""
+        # Use ultralytics API for prediction
         results = self.model(image, verbose=False)
         
-        # 获取检测结果
+        # Get detection results
         detections = []
         
         for result in results:
-            # 如果有检测到的目标
+            # If objects are detected
             if result.boxes is not None and len(result.boxes) > 0:
-                # 获取边界框、置信度和类别
-                boxes = result.boxes.xyxy.cpu().numpy()    # 以(x1,y1,x2,y2)格式获取边界框
-                confs = result.boxes.conf.cpu().numpy()    # 获取置信度
-                clss = result.boxes.cls.cpu().numpy()      # 获取类别索引
+                # Get bounding boxes, confidence scores and classes
+                boxes = result.boxes.xyxy.cpu().numpy()    # Get bounding boxes in (x1,y1,x2,y2) format
+                confs = result.boxes.conf.cpu().numpy()    # Get confidence scores
+                clss = result.boxes.cls.cpu().numpy()      # Get class indices
                 
                 for i, (box, conf, cls) in enumerate(zip(boxes, confs, clss)):
-                    # 过滤低置信度检测
+                    # Filter low confidence detections
                     if conf < self.confidence_threshold:
                         continue
                         
-                    # 获取边界框坐标(左上和右下)
+                    # Get bounding box coordinates (top-left and bottom-right)
                     x1, y1, x2, y2 = box
                     
-                    # 计算中心点和宽高
+                    # Calculate center point and dimensions
                     center_x = int((x1 + x2) / 2)
                     center_y = int((y1 + y2) / 2)
                     width = int(x2 - x1)
                     height = int(y2 - y1)
                     
-                    # 记录检测信息
-                    rospy.loginfo(f"检测到物体: 中心点=({center_x},{center_y}), " 
-                                 f"宽高=({width},{height}), 类别={int(cls)}, 置信度={conf:.3f}")
+                    # Log detection information
+                    rospy.loginfo(f"Detected object: center=({center_x},{center_y}), " 
+                                 f"dimensions=({width},{height}), class={int(cls)}, confidence={conf:.3f}")
                     
                     detections.append({
                         'x': center_x,
@@ -75,7 +75,7 @@ class DetectorNode:
         self.image_sub = rospy.Subscriber(input_topic, Image, self.image_callback)
         self.detection_pub = rospy.Publisher('detection_image', Image, queue_size=1)
         
-        # COCO数据集类别名称
+        # COCO dataset class names
         self.coco_names = ["person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",
                      "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow",
                      "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
@@ -90,52 +90,52 @@ class DetectorNode:
         
     def image_callback(self, msg):
         try:
-            # 转换ROS图像到OpenCV格式
+            # Convert ROS image to OpenCV format
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             
-            # 执行检测
+            # Perform detection
             detections = self.detector.detect(cv_image)
             
-            # 显示结果前复制图像以防止修改原始数据
+            # Copy image before displaying results to avoid modifying original data
             display_image = cv_image.copy()
             
-            rospy.loginfo(f"检测到 {len(detections)} 个物体")
+            rospy.loginfo(f"Detected {len(detections)} objects")
             
-            # 在图像上绘制检测结果
+            # Draw detection results on the image
             for det in detections:
                 x, y = det['x'], det['y']
                 w, h = det['width'], det['height']
                 class_id = det['class_id']
                 conf = det['confidence']
                 
-                # 获取类别名称
-                class_name = self.coco_names[class_id] if class_id < len(self.coco_names) else f"类别{class_id}"
+                # Get class name
+                class_name = self.coco_names[class_id] if class_id < len(self.coco_names) else f"class{class_id}"
                 
-                # 在图像上绘制边界框
+                # Draw bounding box on the image
                 left = int(x - w/2)
                 top = int(y - h/2)
                 right = int(x + w/2)
                 bottom = int(y + h/2)
                 
-                # 确保坐标在图像范围内
+                # Ensure coordinates are within image bounds
                 left = max(0, left)
                 top = max(0, top)
                 right = min(display_image.shape[1]-1, right)
                 bottom = min(display_image.shape[0]-1, bottom)
                 
-                # 绘制边界框和标签
+                # Draw bounding box and label
                 cv2.rectangle(display_image, (left, top), (right, bottom), (0, 255, 0), 2)
                 
-                # 添加类别标签和置信度
+                # Add class label and confidence
                 label = f"{class_name}: {conf:.2f}"
                 cv2.putText(display_image, label, (left, top-5), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                 
-            # 显示图像
+            # Display image
             cv2.imshow("YOLOv8 Detections", display_image)
             cv2.waitKey(1)
                 
-            # 发布结果
+            # Publish results
             self.detection_pub.publish(self.bridge.cv2_to_imgmsg(display_image, "bgr8"))
             
         except Exception as e:

@@ -1,10 +1,10 @@
 def draw_bounding_boxes(image, boxes, scores, classes, class_names):
     for box, score, cls in zip(boxes, scores, classes):
-        # ⚠️ 需要调整: 根据应用场景可能需要调整置信度阈值
+        # You may need to adjust confidence threshold based on your application
         if score < 0.5:  # Threshold for displaying boxes
             continue
         x1, y1, x2, y2 = box
-        # ⚠️ 可选调整: 可以自定义不同类别的边界框颜色
+        # You can customize different colors for different object classes
         color = (0, 255, 0)  # Green color for bounding box
         cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
         label = f"{class_names[cls]}: {score:.2f}"

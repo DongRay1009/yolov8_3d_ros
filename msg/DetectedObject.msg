@@ -1,4 +1,4 @@
-# 单个检测到的物体信息
+# Information for a single detected object
 geometry_msgs/Pose pose
 string label
 float32 confidence
