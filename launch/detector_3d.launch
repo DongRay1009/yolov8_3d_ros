@@ -1,12 +1,15 @@
 <launch>
-  <!-- 参数配置 -->
+  <!-- Parameter Configuration -->
+  <!-- MODIFY: Change these topics to match your camera setup -->
   <arg name="rgb_topic" default="/rgb/image_raw"/>
   <arg name="depth_topic" default="/depth_to_rgb/image_raw"/>
   <arg name="camera_info_topic" default="/rgb/camera_info"/>
   
-  <!-- 启动3D检测节点 -->
-  <node name="yolov8_3d_detector" pkg="yolov8_3d" type="detector_3d_node.py" output="screen">
-    <param name="model_path" value="$(find yolov8_3d)/models/yolov8m.pt"/>
+  <!-- Launch 3D Detection Node -->
+  <node name="yolov8_3d_detector" pkg="yolo_graspnet_ros" type="detector_3d_node.py" output="screen">
+    <!-- MODIFY: Change the model path to your YOLOv8 model location -->
+    <param name="model_path" value="$(find yolo_graspnet_ros)/models/yolov8m.pt"/>
+    <!-- MODIFY: Change these topics to match your camera setup -->
     <param name="rgb_topic" value="/rgb/image_raw"/>
     <param name="depth_topic" value="/depth_to_rgb/image_raw"/>
     <param name="camera_info" value="/rgb/camera_info"/>

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(yolov8_3d)
+project(yolo_graspnet_ros)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -15,6 +15,11 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(OpenCV REQUIRED)
 
+add_message_files(
+  FILES
+  DetectedObject.msg
+  DetectedObjectArray.msg
+)
 
 generate_messages(
   DEPENDENCIES
@@ -32,19 +37,16 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 )
 
-
-# 安装Python脚本
 catkin_install_python(PROGRAMS
   scripts/detector_3d_node.py
+  scripts/graspnet_generator_with_dl.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-# 安装启动文件
 install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
 
-# 安装配置文件
 install(DIRECTORY config/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
 )

@@ -1,5 +1,5 @@
 <package format="2">
-  <name>yolov8_3d</name>
+  <name>yolo_graspnet_ros</name>
   <version>0.1.0</version>
   <description>YOLOv8 based 3D object detection for ROS</description>
   <maintainer email="your-email@example.com">Your Name</maintainer>
@@ -16,9 +16,11 @@
   <depend>image_transport</depend>
   <depend>message_filters</depend>
   <depend>tf2_ros</depend>
+  <build_depend>message_generation</build_depend>
   
   <exec_depend>python3-opencv</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
   
   <export>
     <build_type>catkin</build_type>
