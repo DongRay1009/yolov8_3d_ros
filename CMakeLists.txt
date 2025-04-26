@@ -15,11 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(OpenCV REQUIRED)
 
-# 添加自定义消息
-add_message_files(
-  FILES
-  Detection3D.msg
-)
 
 generate_messages(
   DEPENDENCIES
@@ -37,14 +32,6 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(detector_node src/detector_node.cpp src/yolov8_detector.cpp)
-
-target_link_libraries(detector_node
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-)
-
-add_dependencies(detector_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # 安装Python脚本
 catkin_install_python(PROGRAMS
